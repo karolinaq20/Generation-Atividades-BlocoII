@@ -1,6 +1,8 @@
 package org.generation.blogPessoal.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,7 +11,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -33,14 +38,32 @@ public class Postagem {
 	private String texto;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date = new java.sql.Date(System.currentTimeMillis());
+	
 	@ManyToOne
-	@JsonIgnoreProperties("postagem")
+	@JsonIgnoreProperties("postagem")//Professor Plataforma 
 	private Tema tema;
 	
 	@ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
-	@JoinColumn(name = "usuario_id")
+	@JoinColumn(name = "usuario_id")//Professor Plataforma 
 	private Usuario criador;
 	
+	@ManyToMany
+	@JoinTable(
+			name = "relacaoTP",
+			joinColumns = @JoinColumn(name = "fk_postagens"),
+			inverseJoinColumns = @JoinColumn(name = "fk_tema")) // Feito pelo professor Boaz 
+	
+	private List<Tema> temasRelacionados = new ArrayList<>();	
+	
+	
+	public List<Tema> getTemasRelacionados() {
+		return temasRelacionados;
+	}
+
+	public void setTemasRelacionados(List<Tema> temasRelacionados) {
+		this.temasRelacionados = temasRelacionados;
+	}
+
 	public long getId() {
 		return id;
 	}

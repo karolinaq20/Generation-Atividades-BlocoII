@@ -41,5 +41,26 @@ public Optional<Postagem> criarPostagem(Long idUsuario,Postagem novaPostagem){
 		return Optional.empty();
 	}
 }
+	/**
+	 * Utilizada para atualizar os campos de Nome e senha do usuario
+	 * @param idUsuario - Long idUsuario
+	 * @param atualizacaoUsuario - Entidade Usuario
+	 * @author Karolina
+	 * @since 1.0
+	 * @return Retorna um Optional com entidade Usuario caso o mesmo exista.Do contrario um Optional vazio.
+	 */
+	public Optional<Usuario> atualizarUsuario(Long idUsuario,Usuario atualizacaoUsuario){
+		Optional<Usuario> usuarioExistente = repository.findById(idUsuario);
+	
+		if (usuarioExistente.isPresent()) {
+			usuarioExistente.get().setNome(atualizacaoUsuario.getNome());
+			usuarioExistente.get().setSenha(atualizacaoUsuario.getSenha());
+			return Optional.ofNullable(repository.save(usuarioExistente.get()));
+		}else {
+			return Optional.empty();
+		}
+
+	}
+	
 
 }

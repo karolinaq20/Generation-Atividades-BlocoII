@@ -10,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Usuario {
@@ -17,9 +19,9 @@ public class Usuario {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long idUsuario;
-	private String nome;
-	private String usuario;
-	private String senha;
+	private @NotNull (message ="Passar um valor aqui,não pode ser nulo.") String nome; //Escrever uma mensagem para o front end
+	private @NotNull (message ="Passar um valor aqui,não pode ser nulo.")@Size(min = 3,max = 15,message = "Entre 3 a 15 Caracteres") String usuario;
+	private @NotNull (message ="Passar um valor aqui,não pode ser nulo.") String senha;
 	private boolean tipo;
 	public boolean isTipo() {
 		return tipo;

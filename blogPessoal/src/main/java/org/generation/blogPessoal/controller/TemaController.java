@@ -40,8 +40,15 @@ public class TemaController {
 	}
 	@PostMapping
 	public ResponseEntity<Tema> post (@RequestBody Tema tema){
-		return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(tema));
+		return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(tema)); 
 	}
+
+	/*@PostMapping("/salvar")
+	public ResponseEntity<?> salvarTema(@RequestBody novoTema){
+		return ResponseEntity.status(201).body(repository.save(TemaExistente));
+		.map(temaCriado -> ResponseEntuty .status(201).body(temaCriado))
+		.orlElse(ResponseEntity.status(200).body("Tema"+novoTema.getTema()+"existente."));
+	}*/ //metodo do professor
 	
 	@PutMapping
 	public ResponseEntity<Tema> put (@RequestBody Tema tema){
