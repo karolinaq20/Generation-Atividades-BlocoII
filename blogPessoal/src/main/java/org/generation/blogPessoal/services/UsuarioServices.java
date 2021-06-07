@@ -1,66 +1,49 @@
 package org.generation.blogPessoal.services;
 
+import java.nio.charset.Charset;
 import java.util.Optional;
+import org.apache.commons.codec.binary.Base64;
 
-import org.generation.blogPessoal.Repository.PostagemRepository;
 import org.generation.blogPessoal.Repository.UsuarioRepository;
-import org.generation.blogPessoal.model.Postagem;
+import org.generation.blogPessoal.model.UserLogin;
 import org.generation.blogPessoal.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsuarioServices {
 
-	private @Autowired UsuarioRepository repository;
-	private @Autowired PostagemRepository repositoryP;
-	/**
-	 * Metodo Utilizado para cadastrar um usuario no sistema,validando sua existência.
-	 * @param novoUsuario
-	 * @since 1.0
-	 * @return Optional com entidade Usuario dentro ou Optional vazio.
-	 */
+	@Autowired
+	private UsuarioRepository repository;
 	
-	public Optional<Usuario> cadastrarUsuario(Usuario novoUsuario){
-		Optional<Usuario> usuarioExistente = repository.findByUsuario(novoUsuario.getUsuario());
-
-		if (usuarioExistente.isPresent()) {
-			return Optional.empty();
-		} else {
-			return Optional.ofNullable(repository.save(novoUsuario));
+	public Usuario CadastrarUsuario(Usuario usuario) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		
+		String senhaEncoder = encoder.encode(usuario.getSenha());
+		usuario.setSenha(senhaEncoder);
+		
+		return repository.save(usuario);
+	}
+	
+	public Optional<UserLogin> Logar (Optional<UserLogin> user) {
+		
+	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	Optional<Usuario> usuario = repository.findByUsuario(user.get().getUsuario());
+	
+	if(usuario.isPresent()) {
+		if (encoder.matches(user.get().getSenha(), usuario.get().getSenha())) {
+			String auth = user.get().getUsuario() + ":" + user.get().getSenha();
+			byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+			String authHeader = "Basic " + new String (encodedAuth);
+			
+			user.get().setToken(authHeader);
+			user.get().setNome(usuario.get().getNome());
+			
+			return user;
 		}
 		
 	}
-public Optional<Postagem> criarPostagem(Long idUsuario,Postagem novaPostagem){
-	Optional<Usuario> usuarioExistente = repository.findById(idUsuario);
-	
-	if (usuarioExistente.isPresent()) {
-		novaPostagem.setCriador(usuarioExistente.get());
-		return Optional.ofNullable(repositoryP.save(novaPostagem));
-	}else {
-		return Optional.empty();
+	return null;
 	}
-}
-	/**
-	 * Utilizada para atualizar os campos de Nome e senha do usuario
-	 * @param idUsuario - Long idUsuario
-	 * @param atualizacaoUsuario - Entidade Usuario
-	 * @author Karolina
-	 * @since 1.0
-	 * @return Retorna um Optional com entidade Usuario caso o mesmo exista.Do contrario um Optional vazio.
-	 */
-	public Optional<Usuario> atualizarUsuario(Long idUsuario,Usuario atualizacaoUsuario){
-		Optional<Usuario> usuarioExistente = repository.findById(idUsuario);
-	
-		if (usuarioExistente.isPresent()) {
-			usuarioExistente.get().setNome(atualizacaoUsuario.getNome());
-			usuarioExistente.get().setSenha(atualizacaoUsuario.getSenha());
-			return Optional.ofNullable(repository.save(usuarioExistente.get()));
-		}else {
-			return Optional.empty();
-		}
-
-	}
-	
-
 }
